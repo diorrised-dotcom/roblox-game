@@ -1,4 +1,7 @@
 local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Config = require(ReplicatedStorage.Shared.Config)
 
 local LightingSetup = {}
 
@@ -32,6 +35,7 @@ function LightingSetup.Apply()
 	local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect") or Instance.new("ColorCorrectionEffect")
 	cc.Contrast = 0.1
 	cc.Saturation = -0.25
+	cc.TintColor = Color3.new(1, 1, 1):Lerp(Config.UI.Theme.Accent, 0.12) -- cold cast to match the UI
 	cc.Parent = Lighting
 end
 

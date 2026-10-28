@@ -5,6 +5,11 @@ This repo is the **MVP**: one facility (THE BLACKOUT FACILITY), one monster (the
 
 ## Run it
 
+**No install:** paste `tools/InstallInStudio.lua` into Studio's View > Command Bar, press Enter, then Play.
+After editing anything under `src/`, regenerate it with `python3 tools/make_installer.py`.
+
+**With Rojo:**
+
 Requires [Rojo](https://rojo.space) 7.x.
 
 ```bash
@@ -46,6 +51,22 @@ The graybox map is generated at runtime by `MapBuilder` if `Workspace.LightZones
   a second Stalker spawns behind you, the exit gate opens) -> reach the exit.
 - Death = immediate, then spectate (click to cycle). Round ends on escape (10s for the others), total
   elimination, or the 15 minute cap.
+
+## Look and feel (UI)
+
+Everything on screen comes from `src/client/UIStyle.luau`: wide letter-spaced type with a soft glow, chromatic
+"ghost" text that splits apart in bursts, scanlines, rolling CRT bands, static and a vignette.
+The glitch strength follows fear: it rises when your light flickers, when you are in the dark, and as the
+Stalker gets closer, and the screen tears when you are caught.
+
+- **Title screen** (`Menu.client`): a close-up of the Stalker's face lit by the accent colour, with PLAY / RULES /
+  SETTINGS / STATS. The four stars light up at 1, 5, 15 and 30 escapes. Players only join rounds after pressing PLAY.
+- **HUD** (`Hud.client`): light status, stamina line, next-light distance, survivors and zone, plus a status line and
+  CAUGHT / ESCAPED banners.
+- **Mobile**: a **JUMP SPRINT** button (press = sprint + jump, hold = keep sprinting and jump on every landing)
+  and a hold-to-**SPRINT** button. On PC, hold Shift and press Space.
+- **Colour**: change `Config.UI.Theme.Accent` to recolour the whole game (purple, red and amber values are in the comment).
+- **Accessibility**: SETTINGS > SCREEN FX: REDUCED cuts the flashing, static and shake.
 
 ## Map contract (to use your own map instead of the graybox)
 

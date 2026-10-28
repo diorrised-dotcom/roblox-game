@@ -58,9 +58,25 @@ return {
 		FlickerWarning = "",
 		Breathing = "",
 		StalkerSteps = "",
+		Glitch = "", -- short static burst used by the UI
+		MenuAmbience = "",
 	},
 
 	UI = {
 		ShowNextLightDistance = true, -- turn off for harder modes
+		ReducedEffects = false, -- players can also toggle this in SETTINGS (less flashing/static)
+
+		-- One accent colour drives every glow, line and CRT band.
+		-- Try Color3.fromRGB(140, 90, 255) for purple, (255, 60, 60) for red, (255, 180, 80) for amber.
+		Theme = {
+			Accent = Color3.fromRGB(110, 160, 255),
+			Text = Color3.fromRGB(226, 230, 240),
+			Dim = Color3.fromRGB(105, 110, 128),
+			Warning = Color3.fromRGB(255, 190, 80),
+			Danger = Color3.fromRGB(255, 64, 64),
+			GhostA = Color3.fromRGB(255, 40, 90), -- chromatic split colours on glitching text
+			GhostB = Color3.fromRGB(40, 220, 255),
+			Panel = Color3.fromRGB(5, 6, 10),
+		},
 	},
 }

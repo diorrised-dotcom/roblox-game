@@ -20,6 +20,9 @@ local function load(player)
 	local coins = Instance.new("IntValue")
 	coins.Name = "Coins"
 	coins.Parent = stats
+	local escapes = Instance.new("IntValue")
+	escapes.Name = "Escapes"
+	escapes.Parent = stats
 	stats.Parent = player
 
 	if store then
@@ -30,6 +33,7 @@ local function load(player)
 			if type(data) == "table" then
 				xp.Value = data.XP or 0
 				coins.Value = data.Coins or 0
+				escapes.Value = data.Escapes or 0
 			end
 			loaded[player] = true
 		end
@@ -42,7 +46,7 @@ local function save(player)
 		return
 	end
 	pcall(function()
-		store:SetAsync(tostring(player.UserId), { XP = stats.XP.Value, Coins = stats.Coins.Value })
+		store:SetAsync(tostring(player.UserId), { XP = stats.XP.Value, Coins = stats.Coins.Value, Escapes = stats.Escapes.Value })
 	end)
 end
 
@@ -51,6 +55,13 @@ function Progression.Award(player, reward)
 	if stats then
 		stats.XP.Value += reward.XP
 		stats.Coins.Value += reward.Coins
+	end
+end
+
+function Progression.AddEscape(player)
+	local stats = player:FindFirstChild("leaderstats")
+	if stats then
+		stats.Escapes.Value += 1
 	end
 end
 

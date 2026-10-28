@@ -7,6 +7,7 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local LightService = require(script.Parent.LightService)
 local Stalker = require(script.Parent.Stalker)
 local Progression = require(script.Parent.Progression)
+local Remotes = require(script.Parent.Remotes)
 
 local R = Config.Round
 local RoundService = {}
@@ -21,6 +22,17 @@ local firstEscapeAt = nil
 local connections = {}
 
 local minPlayers = if RunService:IsStudio() then 1 else R.MinPlayers
+
+-- only players who pressed PLAY on the title screen take part in rounds
+local function readyPlayers()
+	local list = {}
+	for _, p in Players:GetPlayers() do
+		if p:GetAttribute("Ready") == true then
+			table.insert(list, p)
+		end
+	end
+	return list
+end
 
 local function setStatus(text)
 	ReplicatedStorage:SetAttribute("Status", text)
@@ -156,6 +168,7 @@ local function connectObjective()
 			local player = Players:GetPlayerFromCharacter(hit.Parent)
 			if player and state == "Playing" and alive[player] and not escaped[player] and switchesOn >= R.SwitchesRequired then
 				escaped[player] = true
+				Progression.AddEscape(player)
 				player:SetAttribute("Escaped", true)
 				firstEscapeAt = firstEscapeAt or os.clock()
 				publishCounts()
@@ -183,10 +196,12 @@ local function playRound()
 	table.clear(alive)
 	table.clear(escaped)
 	firstEscapeAt = nil
-	for _, p in Players:GetPlayers() do
+	for _, p in readyPlayers() do
 		if count(participants) < R.MaxPlayers then
 			participants[p] = true
 		end
+	end
+	for _, p in Players:GetPlayers() do
 		p:SetAttribute("Escaped", false)
 	end
 
@@ -202,6 +217,10 @@ local function playRound()
 	for _, p in Players:GetPlayers() do
 		if not participants[p] then
 			p:SetAttribute("Spectating", true)
+			-- remove lobby bodies so non-players cannot arm lights or draw the Stalker
+			if p.Character then
+				p.Character:Destroy()
+			end
 		end
 	end
 	publishCounts()
@@ -270,6 +289,10 @@ end
 function RoundService.Init()
 	Players.CharacterAutoLoads = false
 
+	Remotes.Ready.OnServerEvent:Connect(function(player)
+		player:SetAttribute("Ready", true)
+	end)
+
 	Players.PlayerAdded:Connect(hookPlayer)
 	for _, p in Players:GetPlayers() do
 		hookPlayer(p)
@@ -294,18 +317,18 @@ function RoundService.Init()
 				task.spawn(loadInLobby, p)
 			end
 
-			while #Players:GetPlayers() < minPlayers do
-				setStatus(string.format("WAITING FOR PLAYERS (%d/%d)", #Players:GetPlayers(), minPlayers))
+			while #readyPlayers() < minPlayers do
+				setStatus(string.format("WAITING FOR PLAYERS (%d/%d)", #readyPlayers(), minPlayers))
 				task.wait(1)
 			end
 			for i = R.IntermissionSeconds, 1, -1 do
 				setStatus("ROUND STARTS IN " .. i)
 				task.wait(1)
-				if #Players:GetPlayers() < minPlayers then
+				if #readyPlayers() < minPlayers then
 					break
 				end
 			end
-			if #Players:GetPlayers() >= minPlayers then
+			if #readyPlayers() >= minPlayers then
 				playRound()
 			end
 		end
